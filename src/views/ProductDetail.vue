@@ -2,31 +2,32 @@
   <v-container>
     <v-row>
       <!-- Back button -->
-      <v-col cols="12">
-        <!-- TODO: Add a back button that navigates to the home page -->
-        <!-- HINT: Use router.back() or router.push('/') -->
+      <v-col cols="12" class="text-left">
+         <v-btn @click="router.back()">
+          <v-icon>mdi-arrow-left</v-icon>
+         </v-btn>
       </v-col>
 
       <!-- Image Gallery Column -->
       <v-col cols="12" md="6">
-        <!-- TODO: Create a large main image display -->
-        <!-- HINT: Use v-img with the current selected image -->
-        
-        <!-- TODO: Create thumbnail gallery below main image -->
-        <!-- HINT: Use v-row with smaller v-img cards that are clickable -->
-        <!-- HINT: Track selected image index in a ref() -->
+         <v-img :src="selectedImage?.url" aspect-ratio="1"></v-img>
+         <v-row>
+          <v-col v-for="(image, index) in product?.images || []" :key="index" cols="3" sm="3">
+            <v-img 
+              :src="image.url"
+              @click="selectImage((Number(index)))"
+              class="cursor-pointer thumbnail"
+              :class="{'selected': selectedImageIndex === index}"
+            />
+          </v-col>
+        </v-row>
       </v-col>
 
       <!-- Product Info Column -->
       <v-col cols="12" md="6">
-        <!-- TODO: Display product title -->
-        
-        <!-- TODO: Display product price (remember it's in cents!) -->
-        <!-- HINT: Format as currency: $XX.XX -->
-        
-        <!-- TODO: Display product description -->
-        
-        <!-- TODO: Display product SKU if available -->
+         <h1>{{ product?.title }}</h1>
+         <p>${{ (product?.price_cents / 100).toFixed(2) }}</p>
+         <p>{{ product?.description }}</p>
         
         <!-- Product Options/Preferences Section -->
         <!-- TODO: Add a section for product customization options -->
@@ -37,16 +38,18 @@
           - Custom text engraving input (v-text-field)
           - Finish options (v-radio-group or v-select)
         -->
+
+        <!-- Quantity Selector -->
+         <v-text-field
+          v-model="quantity"
+          type="number"
+          label="Quantity"
+          min="0"
+        ></v-text-field>
         
-        <!-- TODO: Add quantity selector -->
-        <!-- HINT: Use v-text-field with type="number" or custom +/- buttons -->
-        
-        <!-- TODO: Add "Add to Cart" button -->
-        <!-- HINT: Import and use useCartStore() -->
-        <!-- HINT: Consider the selected options when adding to cart -->
-        
-        <!-- TODO: Display inventory status -->
-        <!-- HINT: Show "In Stock" / "Low Stock" / "Out of Stock" based on inventory -->
+         <v-btn @click="addToCart">
+          Add to Cart
+         </v-btn>
       </v-col>
     </v-row>
 
@@ -74,55 +77,69 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCartStore } from '../stores/cart'
-// TODO: Import supabase client to fetch product by ID or slug
+import { supabase } from '../lib/supabase';
+
 
 const route = useRoute()
 const router = useRouter()
 const cart = useCartStore()
+const productSlug = route.params.slug
 
-// TODO: Get product ID or slug from route params
-// HINT: const productId = route.params.id
+ const product = ref<any>(null)
+ const loading = ref(false)
+ const error = ref<string | null>(null)
+ const selectedImageIndex = ref(0)
+ const quantity = ref(0)
 
-// TODO: Create refs for component state
-// const product = ref<any>(null)
-// const loading = ref(false)
-// const error = ref<string | null>(null)
-// const selectedImageIndex = ref(0)
-// const quantity = ref(1)
+ const selectedImage = computed(() => {
+  if (!product.value?.images?.length) return null
+  return product.value.images[selectedImageIndex.value] || product.value.images[0]
+})
 
-// TODO: Create refs for product options/preferences
-// const selectedColor = ref('')
-// const selectedSize = ref('')
-// const customText = ref('')
+async function loadProduct() {
+  // Fetch product by ID or slug
+  // Handle loading and error states
+  loading.value = true
+  const { data, error: fetchError } = await supabase.from('products').select('*').eq('slug', productSlug).single()
+  if (fetchError) {
+    error.value = fetchError.message
+  } else {
+    product.value = data
+  }
+  loading.value = false
+}
 
-// TODO: Create computed property for selected image
-// const selectedImage = computed(() => { ... })
+ function selectImage(index: number) { 
+    selectedImageIndex.value = index
+  }
 
-// TODO: Create function to fetch product from Supabase
-// async function loadProduct() {
-//   // Fetch product by ID or slug
-//   // Handle loading and error states
-// }
 
-// TODO: Create function to change selected image
-// function selectImage(index: number) { ... }
+function addToCart() {
+  // Validate quantity and required options
+  // Add to cart with selected preferences
+  // Show success message (optional: use v-snackbar)
+  if (quantity.value > 0) {
+    cart.addItem(product.value, quantity.value)
+  }
+}
 
-// TODO: Create function to add product to cart with options
-// function addToCart() {
-//   // Validate quantity and required options
-//   // Add to cart with selected preferences
-//   // Show success message (optional: use v-snackbar)
-// }
-
-// TODO: Call loadProduct when component mounts
-// onMounted(() => { ... })
+onMounted(() => {
+  loadProduct()
+})
 </script>
 
 <style scoped>
-/* TODO: Add custom styles */
-/* IDEAS:
-  - Hover effects on thumbnails
-  - Transition animations for image gallery
-  - Custom styling for option selectors
-*/
+.thumbnail {
+  opacity: 0.5;
+  transition: opacity 0.3s;
+}
+
+.thumbnail:hover {
+  opacity: 0.8;
+}
+
+.thumbnail.selected {
+  opacity: 1;
+  border: 2px solid #1976d2;
+}
 </style>

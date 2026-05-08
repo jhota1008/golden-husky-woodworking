@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useCartStore } from './stores/cart.ts'
+import { useRouter } from 'vue-router'
 
 const cart = useCartStore()
 const cartOpen = ref(false)
@@ -13,11 +14,20 @@ function toggleTheme() {
 function remove(productId: string) {
   cart.removeItem(productId)
 }
+
+const router = useRouter();
+
+function goToHomePage() {
+  router.push({ name: 'Home' });
+}
 </script>
 
 <template>
   <v-app :class="{ 'theme--dark': isDark }">
     <v-app-bar elevated>
+      <v-btn icon @click="goToHomePage" aria-label="Go to home page">
+        <v-icon>mdi-home</v-icon>
+      </v-btn>
       <v-toolbar-title>My Shop — Guitar & Woodwork</v-toolbar-title>
       <v-spacer />
       <v-btn icon @click="toggleTheme" aria-label="Toggle theme">
