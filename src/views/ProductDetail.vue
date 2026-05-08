@@ -50,6 +50,9 @@
          <v-btn @click="addToCart">
           Add to Cart
          </v-btn>
+         <v-snackbar v-model="addedToCartSuccess" timeout="3000">
+          {{ addedToCartSuccess ? 'Added to cart!' : '' }}
+         </v-snackbar>
       </v-col>
     </v-row>
 
@@ -89,7 +92,8 @@ const productSlug = route.params.slug
  const loading = ref(false)
  const error = ref<string | null>(null)
  const selectedImageIndex = ref(0)
- const quantity = ref(0)
+ const quantity = ref(1)
+ const addedToCartSuccess = ref(false)
 
  const selectedImage = computed(() => {
   if (!product.value?.images?.length) return null
@@ -115,11 +119,9 @@ async function loadProduct() {
 
 
 function addToCart() {
-  // Validate quantity and required options
-  // Add to cart with selected preferences
-  // Show success message (optional: use v-snackbar)
   if (quantity.value > 0) {
     cart.addItem(product.value, quantity.value)
+    addedToCartSuccess.value = true
   }
 }
 
