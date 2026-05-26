@@ -18,7 +18,7 @@ export const useUserStore = defineStore('user', () => {
   }
 
   // Listen to auth state changes and keep store in sync
-  supabase.auth.onAuthStateChange((event, s) => {
+  supabase.auth.onAuthStateChange((_event, s) => {
     session.value = s ?? null
     user.value = s?.user ?? null
   })

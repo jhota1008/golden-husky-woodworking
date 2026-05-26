@@ -7,6 +7,19 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
+// Whitelist allowed origins for production
+const ALLOWED_ORIGINS = [
+  "http://localhost:5173",
+  "http://localhost:4000", 
+  // TODO: Add your production domain before deploying
+  // "https://yourdomain.com",
+];
+
+function getAllowedOrigin(requestOrigin: string | null): string {
+  if (!requestOrigin) return ALLOWED_ORIGINS[0];
+  return ALLOWED_ORIGINS.includes(requestOrigin) ? requestOrigin : ALLOWED_ORIGINS[0];
+}
+
 const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") ?? "", {
   apiVersion: "2024-06-20",
 });
@@ -40,6 +53,39 @@ Deno.serve(async (req: Request) => {
       });
     }
 
+    // --- SECURITY: Validate prices against database ---
+    // Never trust prices from the client! Users can modify them.
+    const productIds = items.map((i: any) => i.productId);
+    const { data: dbProducts, error: productsError } = await supabaseAdmin
+      .from("products")
+      .select("id, price_cents, title")
+      .in("id", productIds);
+
+    if (productsError || !dbProducts) {
+      throw new Error("Failed to verify product prices");
+    }
+
+    // Build a map of product_id -> actual price from database
+    const priceMap = new Map(dbProducts.map(p => [p.id, p.price_cents]));
+
+    // Verify each item's price matches the database
+    let calculatedTotal = 0;
+    for (const item of items) {
+      const actualPrice = priceMap.get(item.productId);
+      if (!actualPrice) {
+        throw new Error(`Product ${item.productId} not found`);
+      }
+      if (item.price_cents !== actualPrice) {
+        throw new Error(`Price mismatch for ${item.title}`);
+      }
+      calculatedTotal += actualPrice * item.quantity;
+    }
+
+    // Verify the total matches what client calculated
+    if (calculatedTotal !== totalCents) {
+      throw new Error("Cart total mismatch");
+    }
+
     // --- 1. Create a pending order in DB BEFORE going to Stripe ---
     // This gives us an order_id to embed in the Stripe session metadata.
     // The webhook will update this order to 'paid' after payment succeeds.
@@ -49,6 +95,7 @@ Deno.serve(async (req: Request) => {
         user_id: userId,
         status: "pending",
         total_cents: totalCents,
+        customer_email: shipping.email,
         shipping,
         metadata: { item_count: items.length },
       }])
@@ -89,7 +136,8 @@ Deno.serve(async (req: Request) => {
 
     // --- 4. Create the Stripe Checkout Session ---
     // Embed order_id in metadata so the webhook knows which DB row to update.
-    const origin = req.headers.get("origin") ?? "http://localhost:5173";
+    const requestOrigin = req.headers.get("origin");
+    const origin = getAllowedOrigin(requestOrigin);
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",

@@ -47,7 +47,7 @@ Deno.serve(async (req: Request) => {
 
   let event: Stripe.Event;
   try {
-    event = stripe.webhooks.constructEvent(rawBody, signature, STRIPE_WEBHOOK_SECRET ?? "");
+    event = await stripe.webhooks.constructEventAsync(rawBody, signature, STRIPE_WEBHOOK_SECRET ?? "");
   } catch (err) {
     console.error("Webhook signature verification failed", err);
     return new Response(JSON.stringify({ error: "Invalid signature" }), {
@@ -58,13 +58,17 @@ Deno.serve(async (req: Request) => {
 
   // Persist every Stripe event for auditing (idempotent via upsert)
   try {
+    const createdAt = event.created 
+      ? new Date(event.created * 1000).toISOString() 
+      : new Date().toISOString();
+    
     await supabaseAdmin
       .from(DATABASE_PAYMENT_EVENTS_TABLE)
       .upsert(
         {
           event_id: event.id,
           type: event.type,
-          created_at: new Date((event.created ?? 0) * 1000).toISOString(),
+          created_at: createdAt,
           raw: event as unknown as Record<string, unknown>,
         },
         { onConflict: "event_id" },
@@ -90,9 +94,10 @@ Deno.serve(async (req: Request) => {
           .from("orders")
           .update({
             status: "paid",
+            customer_email: session.customer_details?.email ?? session.customer_email,
+            stripe_session_id: session.id,
+            stripe_payment_intent: session.payment_intent as string,
             metadata: {
-              stripe_session_id: session.id,
-              stripe_payment_intent: session.payment_intent,
               paid_at: new Date().toISOString(),
             },
           })
