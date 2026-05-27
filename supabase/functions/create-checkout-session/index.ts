@@ -11,8 +11,8 @@ const corsHeaders = {
 const ALLOWED_ORIGINS = [
   "http://localhost:5173",
   "http://localhost:4000", 
-  // TODO: Add your production domain before deploying
-  // "https://yourdomain.com",
+  "https://goldenhusky.shop",
+  "https://www.goldenhusky.shop"
 ];
 
 function getAllowedOrigin(requestOrigin: string | null): string {

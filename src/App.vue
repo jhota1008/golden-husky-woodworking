@@ -32,7 +32,7 @@ async function handleSignOut() {
       <v-btn icon @click="goToHomePage" aria-label="Go to home page">
         <v-icon>mdi-home</v-icon>
       </v-btn>
-      <v-toolbar-title>Guitar & Woodwork</v-toolbar-title>
+      <v-toolbar-title>Golden Husky Woodworking</v-toolbar-title>
       
       <!-- Navigation Links -->
       <!-- TODO: Style these nav buttons to look better -->
