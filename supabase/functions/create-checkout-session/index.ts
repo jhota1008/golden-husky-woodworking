@@ -43,7 +43,7 @@ Deno.serve(async (req: Request) => {
   }
 
   try {
-    const { items, shipping, userId, totalCents } = await req.json();
+    const { items, shipping, userId, totalCents, sessionTokens } = await req.json();
 
     // Reject unauthenticated requests — guest checkout is not supported
     if (!userId) {
@@ -139,6 +139,17 @@ Deno.serve(async (req: Request) => {
     const requestOrigin = req.headers.get("origin");
     const origin = getAllowedOrigin(requestOrigin);
 
+    // Build success URL with session tokens if provided (for production environments)
+    let successUrl = `${origin}/order-confirmation/${order.id}`;
+    if (sessionTokens?.accessToken && sessionTokens?.refreshToken) {
+      const params = new URLSearchParams({
+        access_token: sessionTokens.accessToken,
+        refresh_token: sessionTokens.refreshToken,
+        type: 'recovery',
+      });
+      successUrl = `${successUrl}?${params.toString()}`;
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       line_items: stripeLineItems,
@@ -148,7 +159,7 @@ Deno.serve(async (req: Request) => {
         user_id: userId ?? "guest",
       },
       // Stripe redirects the browser here after payment
-      success_url: `${origin}/order-confirmation/${order.id}`,
+      success_url: successUrl,
       cancel_url: `${origin}/checkout`,
     });
 

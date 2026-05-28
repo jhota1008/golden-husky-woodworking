@@ -75,10 +75,22 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach(async (to, _from, next) => {
+router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
-  if (!userStore.user) await userStore.fetchSession()
-  if (to.meta.requiresAuth && !userStore.user) return next({ name: 'Auth' })
+  console.log(`[Router] Navigating from ${from.path} to ${to.path}`)
+  console.log(`[Router] Current user:`, userStore.user ? userStore.user.email : 'None')
+  
+  if (!userStore.user) {
+    console.log('[Router] No user in store, fetching session...')
+    await userStore.fetchSession()
+  }
+  
+  if (to.meta.requiresAuth && !userStore.user) {
+    console.log('[Router] Auth required but no user, redirecting to auth')
+    return next({ name: 'Auth' })
+  }
+  
+  console.log('[Router] Navigation allowed')
   next()
 })
 

@@ -142,6 +142,11 @@ async function placeOrder() {
   orderError.value = null
 
   try {
+    // Get the current session access token to pass through Stripe redirect
+    const { data: sessionData } = await supabase.auth.getSession()
+    const accessToken = sessionData?.session?.access_token
+    const refreshToken = sessionData?.session?.refresh_token
+
     // Call the create-checkout-session Edge Function.
     // It creates a pending order in DB + a Stripe Checkout Session
     // and returns the session ID for client-side redirect.
@@ -151,6 +156,7 @@ async function placeOrder() {
         shipping: { ...shipping },
         userId: userStore.user!.id,
         totalCents: cart.subtotalCents,
+        sessionTokens: accessToken && refreshToken ? { accessToken, refreshToken } : null,
       },
     })
 
@@ -164,7 +170,7 @@ async function placeOrder() {
     cart.clear()
 
     // Redirect to Stripe Checkout
-    // The session will be restored in OrderConfirmation via fetchSession()
+    // The session will be restored in OrderConfirmation via URL tokens
     window.location.href = data.url
   } catch (e: any) {
     orderError.value = e?.message ?? 'Something went wrong. Please try again.'
