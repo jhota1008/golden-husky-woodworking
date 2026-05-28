@@ -153,7 +153,11 @@ Deno.serve(async (req: Request) => {
     });
 
     return new Response(
-      JSON.stringify({ url: session.url, order_id: order.id }),
+      JSON.stringify({ 
+        url: session.url, 
+        sessionId: session.id,
+        order_id: order.id 
+      }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (err: any) {

@@ -144,7 +144,7 @@ async function placeOrder() {
   try {
     // Call the create-checkout-session Edge Function.
     // It creates a pending order in DB + a Stripe Checkout Session
-    // and returns the Stripe-hosted payment URL.
+    // and returns the session ID for client-side redirect.
     const { data, error } = await supabase.functions.invoke('create-checkout-session', {
       body: {
         items: cart.items,
@@ -160,11 +160,11 @@ async function placeOrder() {
       throw new Error(error.message)
     }
 
-    // Clear cart before redirect — Stripe will bring the user back to
-    // /order-confirmation/:id on success
+    // Clear cart before redirect
     cart.clear()
 
-    // Redirect to Stripe-hosted checkout page
+    // Redirect to Stripe Checkout
+    // The session will be restored in OrderConfirmation via fetchSession()
     window.location.href = data.url
   } catch (e: any) {
     orderError.value = e?.message ?? 'Something went wrong. Please try again.'
