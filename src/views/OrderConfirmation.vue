@@ -18,16 +18,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { useUserStore } from '../stores/user'
 
 const route = useRoute()
+const userStore = useUserStore()
+
 const orderId = computed(() => {
   const id = route.params.id
   return Array.isArray(id) ? id[0] : (id ?? '')
 })
 
-
+// Ensure session is loaded after returning from Stripe
+// so navigation to OrderHistory works correctly
+onMounted(async () => {
+  await userStore.fetchSession()
+})
 </script>
 
 <style scoped>

@@ -16,9 +16,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { supabase } from '../lib/supabase'
 import { useUserStore } from '../stores/user'
 
+const router = useRouter()
+const route = useRoute()
 const email = ref('')
 const password = ref('')
 const error = ref<string | null>(null)
@@ -33,6 +36,10 @@ async function signIn() {
     } else {
       // update local store; the store also listens to auth changes
       await userStore.fetchSession()
+      
+      // Redirect after successful sign-in
+      const redirectTo = route.query.redirect as string || '/'
+      router.push(redirectTo)
     }
   } catch (e: any) {
     error.value = e?.message ?? String(e)
