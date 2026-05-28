@@ -7,11 +7,18 @@
       <v-text-field v-model="passwordConfirm" label="Confirm Password" type="password" />
     </v-card-text>
     <v-card-actions>
-      <v-btn color="primary" @click="signUp">Create</v-btn>
-      <v-spacer />
-      <v-btn text @click="$emit('switch','signin')">Have an account?</v-btn>
+      <v-btn color="primary" block @click="signUp">Create Account</v-btn>
     </v-card-actions>
     <v-alert v-if="error" type="error" dense class="mt-2">{{ error }}</v-alert>
+    
+    <v-divider class="my-4" />
+    
+    <div class="text-center text-body-2">
+      <span class="text-medium-emphasis">Already have an account?</span>
+      <v-btn variant="text" color="primary" size="small" @click="$emit('switch','signin')">
+        Sign in
+      </v-btn>
+    </div>
   </v-card>
 </template>
 

@@ -8,12 +8,20 @@ export const useUserStore = defineStore('user', () => {
 
   async function fetchSession() {
     try {
-      const { data } = await supabase.auth.getSession()
+      console.log('[UserStore] Fetching session...')
+      const { data, error } = await supabase.auth.getSession()
+      if (error) {
+        console.error('[UserStore] Session fetch error:', error)
+      }
       session.value = data.session ?? null
       user.value = data.session?.user ?? null
+      console.log('[UserStore] Session fetched:', user.value ? `User: ${user.value.email}` : 'No user')
+      return user.value
     } catch (e) {
+      console.error('[UserStore] Exception fetching session:', e)
       session.value = null
       user.value = null
+      return null
     }
   }
 
