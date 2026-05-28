@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useTheme } from 'vuetify'
 import { useCartStore } from './stores/cart.ts'
 import { useUserStore } from './stores/user'
 import { useRouter } from 'vue-router'
@@ -8,10 +9,10 @@ import CartDrawer from './components/CartDrawer.vue'
 const cart = useCartStore()
 const userStore = useUserStore()
 const cartOpen = ref(false)
-const isDark = ref(false)
+const theme = useTheme()
 
 function toggleTheme() {
-  isDark.value = !isDark.value
+  theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark'
 }
 
 const router = useRouter();
@@ -27,7 +28,7 @@ async function handleSignOut() {
 </script>
 
 <template>
-  <v-app :class="{ 'theme--dark': isDark }">
+  <v-app>
     <v-app-bar elevated>
       <v-btn icon @click="goToHomePage" aria-label="Go to home page">
         <v-icon>mdi-home</v-icon>
