@@ -7,6 +7,7 @@ import GuitarServices from '../views/GuitarServices.vue'
 import CustomGuitars from '../views/CustomGuitars.vue'
 import Auth from '../views/Auth.vue'
 import OrderHistory from '../views/OrderHistory.vue'
+import OrderDetail from '../views/OrderDetail.vue'
 import Checkout from '../views/Checkout.vue'
 import OrderConfirmation from '../views/OrderConfirmation.vue'
 import {useUserStore} from '../stores/user'
@@ -48,6 +49,12 @@ const routes = [
     name: 'OrderHistory',
     meta: { requiresAuth: true },
     component: OrderHistory,
+  },
+  {
+    path: '/order/:id',
+    name: 'OrderDetail',
+    meta: { requiresAuth: true },
+    component: OrderDetail,
   },
   {
     path: '/checkout',
