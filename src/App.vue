@@ -32,23 +32,17 @@ async function handleSignOut() {
       <v-btn icon @click="goToHomePage" aria-label="Go to home page">
         <v-icon>mdi-home</v-icon>
       </v-btn>
-      <v-toolbar-title>Golden Husky Woodworking</v-toolbar-title>
+      <v-toolbar-title class="d-none d-sm-block">Golden Husky Woodworking</v-toolbar-title>
+      <v-toolbar-title class="d-block d-sm-none">GHW</v-toolbar-title>
       
       <!-- Navigation Links -->
-      <!-- TODO: Style these nav buttons to look better -->
-      <!-- IDEAS: 
-        - Use v-btn with variant="text" for a cleaner look
-        - Add active state styling (check $route.name)
-        - Make them more prominent or add hover effects
-        - Consider using v-tabs instead of buttons for better UX
-      -->
-      <v-btn variant="text" @click="router.push({ name: 'CustomGuitars' })">
+      <v-btn variant="text" @click="router.push({ name: 'CustomGuitars' })" class="d-none d-md-flex">
         Custom Guitars
       </v-btn>
-      <v-btn variant="text" @click="router.push({ name: 'GuitarServices' })">
+      <v-btn variant="text" @click="router.push({ name: 'GuitarServices' })" class="d-none d-md-flex">
         Services
       </v-btn>
-      <v-btn variant="text" @click="router.push({ name: 'Woodworking' })">
+      <v-btn variant="text" @click="router.push({ name: 'Woodworking' })" class="d-none d-md-flex">
         Woodworking
       </v-btn>
       
