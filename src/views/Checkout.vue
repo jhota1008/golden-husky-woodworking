@@ -85,7 +85,7 @@
           </v-btn>
 
           <p class="text-caption text-center mt-2 text-medium-emphasis">
-            Payments are processed securely via Stripe (test mode).
+            Payments are processed securely via Stripe.
           </p>
         </v-card>
       </v-col>

@@ -32,23 +32,29 @@ const vuetify = createVuetify({
 			light: {
 				dark: false,
 				colors: {
-					background: '#FFFFFF',
+					background: '#FCFCFC',        // White
 					surface: '#FFFFFF',
-					primary: '#1a1a1a',
-					secondary: '#646cff',
+					primary: '#307351',           // Turf Green
+					secondary: '#F3BA0A',         // Amber Gold
+					accent: '#786452',            // Olive Wood
 					error: '#b00020',
-					info: '#2196F3',
-					success: '#4CAF50',
-					warning: '#FB8C00',
+					info: '#307351',              // Turf Green
+					success: '#307351',           // Turf Green
+					warning: '#F3BA0A',           // Amber Gold
 				},
 			},
 			dark: {
 				dark: true,
 				colors: {
-					background: '#121212',
-					surface: '#1e1e1e',
-					primary: '#FFFFFF',
-					secondary: '#646cff',
+					background: '#443730',        // Deep Mocha
+					surface: '#554840',           // Slightly lighter mocha
+					primary: '#307351',           // Turf Green
+					secondary: '#F3BA0A',         // Amber Gold
+					accent: '#786452',            // Olive Wood
+					error: '#ff5252',
+					info: '#307351',
+					success: '#307351',
+					warning: '#F3BA0A',
 				},
 			},
 		},

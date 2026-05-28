@@ -9,7 +9,7 @@ const sections = [
     description: 'Handcrafted guitars tailored to your unique sound and style. Each instrument is a masterpiece of craftsmanship and attention to detail.',
     icon: 'mdi-guitar-electric',
     route: 'CustomGuitars',
-    color: '#8B4513',
+    color: '#307351',
     image: '/cnc_guitar.jpeg'
   },
   {
@@ -17,7 +17,7 @@ const sections = [
     description: 'Professional setup, repair, and maintenance services to keep your guitar playing at its best. From simple adjustments to complete restorations.',
     icon: 'mdi-tools',
     route: 'GuitarServices',
-    color: '#CD853F',
+    color: '#F3BA0A',
     image: '/Fretboard.jpeg'
   },
   {
@@ -25,7 +25,7 @@ const sections = [
     description: 'Custom furniture, cabinetry, and fine woodworking pieces. Quality craftsmanship meets functional design for your home or office.',
     icon: 'mdi-saw-blade',
     route: 'Woodworking',
-    color: '#D2691E',
+    color: '#786452',
     image: '/DogBed3.jpeg'
   }
 ]
@@ -73,7 +73,7 @@ function scrollToProducts() {
                       </p>
                       <v-btn
                         :size="$vuetify.display.smAndDown ? 'large' : 'x-large'"
-                        color="primary"
+                        color="secondary"
                         elevation="8"
                         class="explore-btn"
                         @click="scrollToProducts"
@@ -171,7 +171,7 @@ function scrollToProducts() {
           <v-btn
             size="x-large"
             variant="outlined"
-            color="primary"
+            color="secondary"
             class="mb-4"
             @click="router.push({ name: 'Auth' })"
           >
@@ -266,7 +266,7 @@ function scrollToProducts() {
 }
 
 .cta-section {
-  background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+  background: linear-gradient(135deg, #307351 0%, #443730 100%);
   color: white;
 }
 
