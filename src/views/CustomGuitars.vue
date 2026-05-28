@@ -61,7 +61,7 @@ async function submitContactForm() {
 
   try {
     // Call the Supabase Edge Function
-    const { data, error } = await supabase.functions.invoke('send-contact-email', {
+    const { error } = await supabase.functions.invoke('send-contact-email', {
       body: {
         name: contactForm.value.name,
         email: contactForm.value.email,
